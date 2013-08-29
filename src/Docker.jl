@@ -1,5 +1,5 @@
 module Docker
-	using HTTPClient
+	using WWWClient
 	using JSON
 
 	immutable DockerError
@@ -31,7 +31,7 @@ module Docker
 				 	"Volumes"  		=> ["/.julia" => Dict{String,String}()],
 				 	"VolumesFrom"   => ""]
 		println(JSON.to_json(params))
-		resp = HTTPClient.post(URI("$url/containers/create"),JSON.to_json(params);headers=headers)
+		resp = WWWClient.post(URI("$url/containers/create"),JSON.to_json(params);headers=headers)
 		if resp.status != 201
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -40,7 +40,7 @@ module Docker
 
 	function inspect_container(host,id)
 		url = URI("http://$host:4243/v1.3/containers/$id/json")
-		resp = HTTPClient.get(url)
+		resp = WWWClient.get(url)
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -53,7 +53,7 @@ module Docker
 		url = URI("http://$host:4243/v1.3//containers/$id/start")
 		params = ["Binds" => ["$k:$v" for (k,v) in binds], "ContainerIDFile" => ""]
 		println(JSON.to_json(params))
-		resp = HTTPClient.post(url,JSON.to_json(params);headers=headers)	
+		resp = WWWClient.post(url,JSON.to_json(params);headers=headers)	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -62,7 +62,7 @@ module Docker
 
 	function kill_container(host, id)
 		url = URI("http://$host:4243/v1.3/containers/$id/start")
-		resp = HTTPClient.post(url,"")	
+		resp = WWWClient.post(url,"")	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -71,7 +71,7 @@ module Docker
 
 	function remove_container(host, id)
 		url = URI("http://$host:4243/v1.3/containers/$id")
-		resp = HTTPClient.delete(url)	
+		resp = WWWClient.delete(url)	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -80,11 +80,11 @@ module Docker
 
 	function open_logs_stream(host, id)
 		url = URI("http://$host:4243/v1.3/containers/$id/attach?stderr=1&stdin=1&stdout=1&stream=1")
-		HTTPClient.open_stream(,["Content-Type"=>"plain/text"],"","POST")
+		WWWClient.open_stream(,["Content-Type"=>"plain/text"],"","POST")
 	end
 
 	function cleanse!(host)
-		resp = HTTPClient.get(URI("http://$host:4243/v1.3/containers/json?all=true"))
+		resp = WWWClient.get(URI("http://$host:4243/v1.3/containers/json?all=true"))
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
