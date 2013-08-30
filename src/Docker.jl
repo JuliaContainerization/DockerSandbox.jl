@@ -9,6 +9,9 @@ module Docker
 
 	const headers = {"Content-Type"=>"application/json"}
 
+	docker_uri(host) = URI("http://$host/v1.3")
+	docker_uri(host,endpoint) = URI("http://$host/v1.3/$endpoint")
+
 	function create_container(host, image, cmd::Cmd; 
 				tty = true, 
 				attachStdin  = false,
@@ -17,7 +20,7 @@ module Docker
      			attachStderr = true,
      			ports = [])
 
-		url = "http://$host:4243/v1.3"
+		url = "http://$host/v1.4"
 
 		params =   ["Image" => image, 
 					"Cmd" => [cmd.exec], 
@@ -28,10 +31,10 @@ module Docker
 				 	"AttachStderr" 	=> attachStderr,
 				 	"PortSpecs"		=> [dec(p) for p in ports], 
 				 	"Entrypoint" 	=> [],
-				 	"Volumes"  		=> ["/.julia" => Dict{String,String}()],
+				 	"Volumes"  		=> Dict{String,String}(),
 				 	"VolumesFrom"   => ""]
-		println(JSON.to_json(params))
-		resp = WWWClient.post(URI("$url/containers/create"),JSON.to_json(params);headers=headers)
+		println(json(params))
+		resp = WWWClient.post(URI("$url/containers/create"),json(params);headers=headers)
 		if resp.status != 201
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -39,21 +42,19 @@ module Docker
 	end
 
 	function inspect_container(host,id)
-		url = URI("http://$host:4243/v1.3/containers/$id/json")
-		resp = WWWClient.get(url)
+		resp = WWWClient.get(docker_uri(host,"containers/$id/json"))
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
 		JSON.parse(resp.data)
 	end
 
-	getNattedPort(id,port) = parseint(inspect_container(id)["NetworkSettings"]["PortMapping"]["Tcp"][dec(port)])
+	getNattedPort(host,id,port) = parseint(inspect_container(host,id)["NetworkSettings"]["PortMapping"]["Tcp"][dec(port)])
 
 	function start_container(host, id; binds = Dict{String,String}())
-		url = URI("http://$host:4243/v1.3//containers/$id/start")
 		params = ["Binds" => ["$k:$v" for (k,v) in binds], "ContainerIDFile" => ""]
-		println(JSON.to_json(params))
-		resp = WWWClient.post(url,JSON.to_json(params);headers=headers)	
+		println(json(params))
+		resp = WWWClient.post(docker_uri(host,"containers/$id/start"),json(params);headers=headers)	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -61,8 +62,7 @@ module Docker
 	end
 
 	function kill_container(host, id)
-		url = URI("http://$host:4243/v1.3/containers/$id/start")
-		resp = WWWClient.post(url,"")	
+		resp = WWWClient.post(docker_uri(host,"containers/$id/start"),"")	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -70,8 +70,7 @@ module Docker
 	end
 
 	function remove_container(host, id)
-		url = URI("http://$host:4243/v1.3/containers/$id")
-		resp = WWWClient.delete(url)	
+		resp = WWWClient.delete(docker_uri(host,"containers/$id"))	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -79,12 +78,12 @@ module Docker
 	end
 
 	function open_logs_stream(host, id)
-		url = URI("http://$host:4243/v1.3/containers/$id/attach?stderr=1&stdin=1&stdout=1&stream=1")
-		WWWClient.open_stream(,["Content-Type"=>"plain/text"],"","POST")
+		url = docker_uri(host,"containers/$id/attach?stderr=1&stdin=1&stdout=1&stream=1")
+		WWWClient.open_stream(url,["Content-Type"=>"plain/text"],"","POST")
 	end
 
 	function cleanse!(host)
-		resp = WWWClient.get(URI("http://$host:4243/v1.3/containers/json?all=true"))
+		resp = WWWClient.get(docker_uri(host,"containers/json?all=true"))
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
