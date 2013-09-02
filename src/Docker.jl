@@ -18,7 +18,9 @@ module Docker
 				openStdin    = false,
      			attachStdout = true,
      			attachStderr = true,
-     			ports = [])
+     			volumes = String[],
+     			ports = [],
+     			pwd = "")
 
 		url = "http://$host/v1.4"
 
@@ -31,9 +33,11 @@ module Docker
 				 	"AttachStderr" 	=> attachStderr,
 				 	"PortSpecs"		=> [dec(p) for p in ports], 
 				 	"Entrypoint" 	=> [],
-				 	"Volumes"  		=> Dict{String,String}(),
+				 	"Volumes"  		=> (String=>Dict{String,String})[v => (String=>String)[] for v in volumes],
 				 	"VolumesFrom"   => ""]
-		println(json(params))
+		if !isempty(pwd)
+			params["WorkingDir"] = pwd
+		end
 		resp = WWWClient.post(URI("$url/containers/create"),json(params);headers=headers)
 		if resp.status != 201
 			throw(DockerError(resp.status,resp.data))
