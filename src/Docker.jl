@@ -81,6 +81,14 @@ module Docker
 		resp
 	end
 
+	function list_containers(host)
+		resp = WWWClient.get(docker_uri(host,"containers/json"))
+		if resp.status != 200
+			throw(DockerError(resp.status,resp.data))
+		end
+		JSON.parse(resp.data)
+	end
+
 	function open_logs_stream(host, id)
 		url = docker_uri(host,"containers/$id/attach?stderr=1&stdin=1&stdout=1&stream=1")
 		WWWClient.open_stream(url,["Content-Type"=>"plain/text"],"","POST")
