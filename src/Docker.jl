@@ -89,8 +89,12 @@ module Docker
 		JSON.parse(resp.data)
 	end
 
-	function open_logs_stream(host, id)
-		url = docker_uri(host,"containers/$id/attach?stderr=1&stdin=1&stdout=1&stream=1")
+	function open_logs_stream(host, id; history=false)
+		path = "containers/$id/attach?stderr=1&stdin=1&stdout=1&stream=1"
+		if history
+			path *=  "&logs=1"
+		end
+		url = docker_uri(host,path)
 		WWWClient.open_stream(url,["Content-Type"=>"plain/text"],"","POST")
 	end
 
