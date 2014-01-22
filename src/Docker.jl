@@ -1,5 +1,5 @@
 module Docker
-	using WWWClient
+	using Requests
 	using JSON
 
 	immutable DockerError
@@ -38,7 +38,7 @@ module Docker
 		if !isempty(pwd)
 			params["WorkingDir"] = pwd
 		end
-		resp = WWWClient.post(URI("$url/containers/create"),json(params);headers=headers)
+		resp = post(URI("$url/containers/create"),json(params);headers=headers)
 		if resp.status != 201
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -46,7 +46,7 @@ module Docker
 	end
 
 	function inspect_container(host,id)
-		resp = WWWClient.get(docker_uri(host,"containers/$id/json"))
+		resp = get(docker_uri(host,"containers/$id/json"))
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -57,8 +57,7 @@ module Docker
 
 	function start_container(host, id; binds = Dict{String,String}())
 		params = ["Binds" => ["$k:$v" for (k,v) in binds], "ContainerIDFile" => ""]
-		println(json(params))
-		resp = WWWClient.post(docker_uri(host,"containers/$id/start"),json(params);headers=headers)	
+		resp = post(docker_uri(host,"containers/$id/start"),json(params);headers=headers)	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -66,7 +65,7 @@ module Docker
 	end
 
 	function kill_container(host, id)
-		resp = WWWClient.post(docker_uri(host,"containers/$id/start"),"")	
+		resp = post(docker_uri(host,"containers/$id/start"),"")	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -74,7 +73,7 @@ module Docker
 	end
 
 	function remove_container(host, id)
-		resp = WWWClient.delete(docker_uri(host,"containers/$id"))	
+		resp = delete(docker_uri(host,"containers/$id"))	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -82,7 +81,7 @@ module Docker
 	end
 
 	function list_containers(host)
-		resp = WWWClient.get(docker_uri(host,"containers/json"))
+		resp = get(docker_uri(host,"containers/json"))
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -95,11 +94,11 @@ module Docker
 			path *=  "&logs=1"
 		end
 		url = docker_uri(host,path)
-		WWWClient.open_stream(url,["Content-Type"=>"plain/text"],"","POST")
+		Requests.open_stream(url,["Content-Type"=>"plain/text"],"","POST")
 	end
 
 	function cleanse!(host)
-		resp = WWWClient.get(docker_uri(host,"containers/json?all=true"))
+		resp = get(docker_uri(host,"containers/json?all=true"))
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
