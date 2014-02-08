@@ -9,8 +9,8 @@ module Docker
 
 	const headers = {"Content-Type"=>"application/json"}
 
-	docker_uri(host) = URI("http://$host/v1.3")
-	docker_uri(host,endpoint) = URI("http://$host/v1.3/$endpoint")
+	docker_uri(host) = URI("http://$host/v1.8")
+	docker_uri(host,endpoint) = URI("http://$host/v1.8/$endpoint")
 
 	function create_container(host, image, cmd::Cmd; 
 				tty = true, 
@@ -22,7 +22,7 @@ module Docker
      			ports = [],
      			pwd = "")
 
-		url = "http://$host/v1.4"
+		url = docker_uri(host)
 
 		params =   ["Image" => image, 
 					"Cmd" => [cmd.exec], 
@@ -31,14 +31,14 @@ module Docker
 				 	"OpenStdin" 	=> openStdin,
 				 	"AttachStdout" 	=> attachStdout,
 				 	"AttachStderr" 	=> attachStderr,
-				 	"PortSpecs"		=> [dec(p) for p in ports], 
 				 	"Entrypoint" 	=> [],
 				 	"Volumes"  		=> (String=>Dict{String,String})[v => (String=>String)[] for v in volumes],
-				 	"VolumesFrom"   => ""]
+				 	"VolumesFrom"   => "",
+					"ExposedPorts" 	=> [string(dec(p),"/tcp")=>Dict{Any,Any}() for p in ports]]
 		if !isempty(pwd)
 			params["WorkingDir"] = pwd
 		end
-		resp = post(URI("$url/containers/create"),json(params);headers=headers)
+		resp = post(URI("$url/containers/create"),data = params, headers=headers)
 		if resp.status != 201
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -53,11 +53,11 @@ module Docker
 		JSON.parse(resp.data)
 	end
 
-	getNattedPort(host,id,port) = parseint(inspect_container(host,id)["NetworkSettings"]["PortMapping"]["Tcp"][dec(port)])
+	getNattedPort(host,id,port) = parseint(inspect_container(host,id)["NetworkSettings"]["Ports"][string(dec(port),"/tcp")][1]["HostPort"])
 
-	function start_container(host, id; binds = Dict{String,String}())
-		params = ["Binds" => ["$k:$v" for (k,v) in binds], "ContainerIDFile" => ""]
-		resp = post(docker_uri(host,"containers/$id/start"),json(params);headers=headers)	
+	function start_container(host, id; binds = Dict{String,String}(), ports=[])
+		params = ["Binds" => ["$k:$v" for (k,v) in binds], "ContainerIDFile" => "", "PortBindings" => [string(dec(p),"/tcp") => [Dict{Any,Any}()] for p in ports]]
+		resp = post(docker_uri(host,"containers/$id/start"), data = params, headers=headers)	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
