@@ -7,42 +7,63 @@ module Docker
 		msg::ByteString
 	end
 
-	const headers = {"Content-Type"=>"application/json"}
+    const headers = Dict{}("Content-Type" => "application/json")
 
-	docker_uri(host) = URI("http://$host/v1.8")
-	docker_uri(host,endpoint) = URI("http://$host/v1.8/$endpoint")
+	docker_uri(host) = URI("http://$host/v1.21")
+	docker_uri(host,endpoint) = URI("http://$host/v1.21/$endpoint")
+    parse(data) = JSON.parse(join(map(Char,data)))
 
-	function create_container(host, image, cmd::Cmd; 
-				tty = true, 
+	function create_container(host, image;
+				cmd::Cmd     = ``, 
+                entryPoint   = "",
+				tty          = true, 
 				attachStdin  = false,
 				openStdin    = false,
      			attachStdout = true,
      			attachStderr = true,
-     			volumes = String[],
-     			ports = [],
-     			pwd = "")
+     			memory       = 0,
+     			cpuSets      = "",
+     			volumeDriver = "",
+                portBindings = ["",""], # [ContainerPort,HostPort]
+     			ports        = [],
+     			pwd          = "")
 
 		url = docker_uri(host)
+        
+        params = Dict{}("Image" => image,
+                        "Cmd" => collect(cmd.exec),
+                        "Tty" => tty,
+                        "AttachStdin" 	=> attachStdin,
+                        "OpenStdin" 	=> openStdin,
+                        "AttachStdout" 	=> attachStdout,
+                        "AttachStderr" 	=> attachStderr,
+                        "ExposedPorts" 	=> [string(dec(p),"/tcp")=>Dict{}() for p in ports],
+                        "HostConfig" 	=> Dict{}(
+                                                    "Memory"       => memory,
+                                                    "CpusetCpus"   => cpuSets,
+                                                    "VolumeDriver" => volumeDriver,
+                                                    "PortBindings" => Dict{}( string(portBindings[1],"/tcp") => [Dict{}( "HostPort" => string(portBindings[2]))]
+                                                                            )
+                                                 )
+                        )
+		
+        if !isempty(entryPoint)
+			params["Entrypoint"] = entryPoint
+		end
 
-		params =   ["Image" => image, 
-					"Cmd" => [cmd.exec], 
-				 	"Tty" => tty,
-				 	"AttachStdin" 	=> attachStdin,
-				 	"OpenStdin" 	=> openStdin,
-				 	"AttachStdout" 	=> attachStdout,
-				 	"AttachStderr" 	=> attachStderr,
-				 	"Entrypoint" 	=> [],
-				 	"Volumes"  		=> (String=>Dict{String,String})[v => (String=>String)[] for v in volumes],
-				 	"VolumesFrom"   => "",
-					"ExposedPorts" 	=> [string(dec(p),"/tcp")=>Dict{Any,Any}() for p in ports]]
+		if !isempty(cmd.exec)
+			params["Cmd"] = cmd
+		end
+
 		if !isempty(pwd)
 			params["WorkingDir"] = pwd
 		end
-		resp = post(URI("$url/containers/create"),data = params, headers=headers)
+
+		resp = post(URI("$url/containers/create"),json=params,headers=headers)
 		if resp.status != 201
 			throw(DockerError(resp.status,resp.data))
 		end
-		JSON.parse(resp.data)
+		parse(resp.data)
 	end
 
 	function inspect_container(host,id)
@@ -50,22 +71,51 @@ module Docker
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
-		JSON.parse(resp.data)
+		parse(resp.data)
 	end
 
-	getNattedPort(host,id,port) = parseint(inspect_container(host,id)["NetworkSettings"]["Ports"][string(dec(port),"/tcp")][1]["HostPort"])
-
-	function start_container(host, id; binds = Dict{String,String}(), ports=[])
-		params = ["Binds" => ["$k:$v" for (k,v) in binds], "ContainerIDFile" => "", "PortBindings" => [string(dec(p),"/tcp") => [Dict{Any,Any}()] for p in ports]]
-		resp = post(docker_uri(host,"containers/$id/start"), data = params, headers=headers)	
+	function start_container(host, id)
+		resp = post(docker_uri(host,"containers/$id/start"))
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
 		id
 	end
-
+    
+    function restart_container(host, id)
+		resp = post(docker_uri(host,"containers/$id/restart"))
+		if resp.status != 204
+			throw(DockerError(resp.status,resp.data))
+		end
+        resp
+	end
+	
+    function stop_container(host, id)
+		resp = post(docker_uri(host,"containers/$id/stop"))
+		if resp.status != 204
+			throw(DockerError(resp.status,resp.data))
+		end
+        resp
+	end
+    
+    function pause_container(host, id)
+		resp = post(docker_uri(host,"containers/$id/pause"))
+		if resp.status != 204
+			throw(DockerError(resp.status,resp.data))
+		end
+        resp
+	end
+    
+    function unpause_container(host, id)
+		resp = post(docker_uri(host,"containers/$id/unpause"))
+		if resp.status != 204
+			throw(DockerError(resp.status,resp.data))
+		end
+		id
+	end
+    
 	function kill_container(host, id)
-		resp = post(docker_uri(host,"containers/$id/start"),"")	
+		resp = post(docker_uri(host,"containers/$id/kill"),"")	
 		if resp.status != 204
 			throw(DockerError(resp.status,resp.data))
 		end
@@ -73,11 +123,20 @@ module Docker
 	end
 
 	function remove_container(host, id)
-		resp = delete(docker_uri(host,"containers/$id"))	
+		resp = Requests.delete(docker_uri(host,"containers/$id?force=1"))	
 		if resp.status != 204
-			throw(DockerError(resp.status,resp.data))
+            throw(DockerError(resp.status,resp.data))
 		end
 		resp
+	end
+    
+    function processes_container(host, id)
+		resp = get(docker_uri(host,"containers/$id/top"))
+        println(resp.status)
+		if resp.status != 200
+            throw(DockerError(resp.status,resp.data))
+		end
+        parse(resp.data)
 	end
 
 	function list_containers(host)
@@ -85,16 +144,24 @@ module Docker
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
-		JSON.parse(resp.data)
+		parse(resp.data)
+	end
+	
+    function stats_container(host,id)
+		resp = get(docker_uri(host,"containers/$id/stats?stream=0"))
+		if resp.status != 200
+			throw(DockerError(resp.status,resp.data))
+		end
+		parse(resp.data)
 	end
 
 	function open_logs_stream(host, id; history=false)
-		path = "containers/$id/attach?stderr=1&stdin=1&stdout=1&stream=1"
+		path = "containers/$id/attach?logs&follow=1&stdout=1"
 		if history
 			path *=  "&logs=1"
 		end
 		url = docker_uri(host,path)
-		Requests.open_stream(url,["Content-Type"=>"plain/text"],"","POST")
+		Requests.open_stream(url,[Dict{}("Content-Type"=>"plain/text")],"","POST")
 	end
 
 	function cleanse!(host)
@@ -102,11 +169,12 @@ module Docker
 		if resp.status != 200
 			throw(DockerError(resp.status,resp.data))
 		end
-		data = JSON.parse(resp.data)
+		data = parse(resp.data)
 		for c in data
-			kill_container(host,c["Id"])
-			remove_container(host,c["Id"])
+            remove_container(host,c["Id"])
+            kill_container(host,c["Id"])
 		end
 		nothing
 	end
+
 end
