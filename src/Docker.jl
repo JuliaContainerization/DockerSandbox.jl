@@ -8,7 +8,7 @@ immutable DockerError
     msg::ByteString
 end
 
-const headers = Dict{}("Content-Type" => "application/json")
+const headers = Dict("Content-Type" => "application/json")
 
 docker_uri(host) = URI("http://$host/v1.21")
 docker_uri(host,endpoint) = URI("http://$host/v1.21/$endpoint")
@@ -31,19 +31,19 @@ function create_container(host, image;
 
     url = docker_uri(host)
 
-    params = Dict{}("Image" => image,
+    params = Dict("Image" => image,
                     "Cmd" => collect(cmd.exec),
                     "Tty" => tty,
                     "AttachStdin"   => attachStdin,
                     "OpenStdin"     => openStdin,
                     "AttachStdout"  => attachStdout,
                     "AttachStderr"  => attachStderr,
-                    "ExposedPorts"  => [string(dec(p),"/tcp")=>Dict{}() for p in ports],
-                    "HostConfig"    => Dict{}(
+                    "ExposedPorts"  => [string(dec(p),"/tcp")=>Dict() for p in ports],
+                    "HostConfig"    => Dict(
                                                 "Memory"       => memory,
                                                 "CpusetCpus"   => cpuSets,
                                                 "VolumeDriver" => volumeDriver,
-                                                "PortBindings" => Dict{}( string(portBindings[1],"/tcp") => [Dict{}( "HostPort" => string(portBindings[2]))]
+                                                "PortBindings" => Dict( string(portBindings[1],"/tcp") => [Dict( "HostPort" => string(portBindings[2]))]
                                                                         )
                                             )
                     )
@@ -162,7 +162,7 @@ function open_logs_stream(host, id; history=false)
         path *=  "&logs=1"
     end
     url = docker_uri(host,path)
-    Requests.open_stream(url,[Dict{}("Content-Type"=>"plain/text")],"","POST")
+    Requests.open_stream(url,[Dict("Content-Type"=>"plain/text")],"","POST")
 end
 
 function cleanse!(host)
