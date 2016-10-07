@@ -14,39 +14,45 @@ docker_uri(host) = URI("http://$host/v1.21")
 docker_uri(host,endpoint) = URI("http://$host/v1.21/$endpoint")
 parse(data) = JSON.parse(join(map(Char,data)))
 
-function create_container(host, image;
-                        cmd::Cmd     = ``,
-                        entryPoint   = "",
-                        tty          = true,
-                        attachStdin  = false,
-                        openStdin    = false,
-                        attachStdout = true,
-                        attachStderr = true,
-                        memory       = 0,
-                        cpuSets      = "",
-                        volumeDriver = "",
-                        portBindings = ["",""], # [ContainerPort,HostPort]
-                        ports        = [],
-                        pwd          = "")
+function create_container(
+        host, image;
+        cmd::Cmd     = ``,
+        entryPoint   = "",
+        tty          = true,
+        attachStdin  = false,
+        openStdin    = false,
+        attachStdout = true,
+        attachStderr = true,
+        memory       = 0,
+        cpuSets      = "",
+        volumeDriver = "",
+        portBindings = ["",""], # [ContainerPort,HostPort]
+        ports        = [],
+        pwd          = ""
+    )
 
     url = docker_uri(host)
 
-    params = Dict("Image" => image,
-                    "Cmd" => collect(cmd.exec),
-                    "Tty" => tty,
-                    "AttachStdin"   => attachStdin,
-                    "OpenStdin"     => openStdin,
-                    "AttachStdout"  => attachStdout,
-                    "AttachStderr"  => attachStderr,
-                    "ExposedPorts"  => [string(dec(p),"/tcp")=>Dict() for p in ports],
-                    "HostConfig"    => Dict(
-                                                "Memory"       => memory,
-                                                "CpusetCpus"   => cpuSets,
-                                                "VolumeDriver" => volumeDriver,
-                                                "PortBindings" => Dict( string(portBindings[1],"/tcp") => [Dict( "HostPort" => string(portBindings[2]))]
-                                                                        )
-                                            )
-                    )
+    params = Dict(
+        "Image" => image,
+        "Cmd" => collect(cmd.exec),
+        "Tty" => tty,
+        "AttachStdin"   => attachStdin,
+        "OpenStdin"     => openStdin,
+        "AttachStdout"  => attachStdout,
+        "AttachStderr"  => attachStderr,
+        "ExposedPorts"  => [string(dec(p),"/tcp") => Dict() for p in ports],
+        "HostConfig"    => Dict(
+            "Memory"       => memory,
+            "CpusetCpus"   => cpuSets,
+            "VolumeDriver" => volumeDriver,
+            "PortBindings" => Dict(
+                string(portBindings[1],"/tcp") => [
+                    Dict("HostPort" => string(portBindings[2]))
+                ]
+            )
+        )
+    )
 
     if !isempty(entryPoint)
         params["Entrypoint"] = entryPoint
