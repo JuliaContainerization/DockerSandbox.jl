@@ -2,10 +2,11 @@ module Docker
 
 using Requests
 using JSON
+using Compat
 
 immutable DockerError
     status::Int
-    msg::ByteString
+    msg::Compat.String
 end
 
 const headers = Dict("Content-Type" => "application/json")
@@ -41,7 +42,7 @@ function create_container(
         "OpenStdin"     => openStdin,
         "AttachStdout"  => attachStdout,
         "AttachStderr"  => attachStderr,
-        "ExposedPorts"  => [string(dec(p),"/tcp") => Dict() for p in ports],
+        "ExposedPorts"  => Dict([Pair(string(dec(p),"/tcp"), Dict()) for p in ports]),
         "HostConfig"    => Dict(
             "Memory"       => memory,
             "CpusetCpus"   => cpuSets,
