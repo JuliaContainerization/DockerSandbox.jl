@@ -35,7 +35,6 @@ function create_container(
 
     params = Dict(
         "Image" => image,
-        "Cmd" => collect(cmd.exec),
         "Tty" => tty,
         "AttachStdin"   => attachStdin,
         "OpenStdin"     => openStdin,
@@ -59,7 +58,7 @@ function create_container(
     end
 
     if !isempty(cmd.exec)
-        params["Cmd"] = cmd
+        params["Cmd"] = collect(cmd.exec)
     end
 
     if !isempty(pwd)
