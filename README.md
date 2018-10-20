@@ -2,6 +2,8 @@
 
 A Julia interface for the Docker Remote API. It provides basic features to run containers and manage them.
 
+The package is tested against Julia 1.0.1 on Linux.
+
 ## Installation
 
 ```
@@ -30,7 +32,7 @@ create_container("127.0.0.1:4243","ubuntu:latest",memory=512*(10^6),portBindings
 * ``entrypoint`` (string): An entrypoint
 * ``cmd`` (string): Command to be executed
 * ``image`` (string): Image name to get
-* ``tty`` (bool): Allocate a pseudo-TTY. Default: True
+* ``tty_stream`` (bool): Allocate a pseudo-TTY. Default: True
 * ``AttachStdin`` (bool): Attach STDIN. Default: False
 * ``openStdin`` (bool): Keep STDIN open even if not attached. Default: False
 * ``attachStdout`` (bool): Attach to stdout of the exec command if true. Default: True
@@ -39,6 +41,7 @@ create_container("127.0.0.1:4243","ubuntu:latest",memory=512*(10^6),portBindings
 * ``CpuSets`` (string): CPUs in which to allow execution. Example: "0-2", "0,1"
 * ``volumeDriver`` (string): The name of a volume driver/plugin.
 * ``portBindings`` (list): Provide a list of ports to open inside the containers in format [ContainerPort,HostPort].
+* ``workingDir`` (string): Specifies the working directory for commands to run in.
 
 **Returns**: A dictionary with an image 'Id' key and a 'Warnings' key.
 
