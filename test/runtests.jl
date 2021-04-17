@@ -16,24 +16,21 @@ using Test
             code = """
             println("This was a success.")
             """
-            cmd = `julia -e $(code)`
-            @test success(container, config, cmd)
+            @test success(container, config, `julia -e $(code)`)
         end
 
         with_container() do container
             code = """
             throw(ErrorException("This was a failure."))
             """
-            cmd = `julia -e $(code)`
-            @test !success(container, config, cmd)
+            @test !success(container, config, `julia -e $(code)`)
         end
 
         with_container() do container
             code = """
             println("This was a success.")
             """
-            cmd = `julia -e $(code)`
-            p = run(container, config, cmd; wait = false)
+            p = run(container, config, `julia -e $(code)`; wait = false)
             wait(p)
             @test success(p)
         end
@@ -42,8 +39,7 @@ using Test
             code = """
             throw(ErrorException("This was a failure."))
             """
-            cmd = `julia -e $(code)`
-            p = run(container, config, cmd; wait = false)
+            p = run(container, config, `julia -e $(code)`; wait = false)
             wait(p)
             @test !success(p)
         end
