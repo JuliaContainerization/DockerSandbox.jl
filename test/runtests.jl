@@ -8,7 +8,7 @@ using Test
 
     @testset "Basic test" begin
         config = DockerConfig(;
-            image = "julia:latest",
+            image = "julia:buster",
             verbose = true,
         )
 
