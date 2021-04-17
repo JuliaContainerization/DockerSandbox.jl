@@ -1,0 +1,13 @@
+name = "Docker"
+uuid = "986af565-53f0-44c3-b39e-2c856a74fab4"
+authors = ["Keno Fischer", "Dilum Aluthge", "contributors"]
+version = "1.0.0-DEV"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+julia = "1.6"
+
+[targets]
+test = ["Test"]
