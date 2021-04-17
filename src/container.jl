@@ -58,7 +58,7 @@ function build_docker_image(config::DockerConfig)
         cd(tmp_dir) do
             rm("Dockerfile"; force = true, recursive = true)
             open("Dockerfile", "w") do io
-                println(io, "FROM --platform=linux $(config.image)")
+                println(io, "FROM --platform=linux/amd64 $(config.image)")
                 println(io, "RUN usermod -L root") # lock the `root` account to prevent logging in as root
                 println(io, "RUN groupadd --system myuser") # create the group for the non-root user
                 println(io, "RUN useradd --create-home --shell /bin/bash --system --gid myuser myuser") # create the non-root user
