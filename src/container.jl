@@ -58,7 +58,7 @@ function build_docker_image(config::DockerConfig)
         cd(tmp_dir) do
             rm("Dockerfile"; force = true, recursive = true)
             open("Dockerfile", "w") do io
-                println(io, "FROM $(config.image)")
+                println(io, "FROM --platform=linux $(config.image)")
                 println(io, "RUN usermod -L root") # lock the `root` account to prevent logging in as root
                 println(io, "RUN groupadd --system myuser") # create the group for the non-root user
                 println(io, "RUN useradd --create-home --shell /bin/bash --system --gid myuser myuser") # create the non-root user
@@ -87,9 +87,10 @@ function build_container_command(container::DockerContainer,
 
     container_cmd_string = String[
         "docker", "run",
-        "--interactive",
-        "--security-opt", "no-new-privileges",
-        "--label", docker_image_label(container),
+        "--rm=true",                              # automatically remove the container when it exits
+        "--interactive",                          # keep STDIN open even if not attached
+        "--security-opt=no-new-privileges",       # disable container processes from gaining new privileges
+        "--label", docker_image_label(container), # set metadata
     ]
 
     # If we're doing a fully-interactive session, tell it to allocate a psuedo-TTY
