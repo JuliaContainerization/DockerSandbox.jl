@@ -6,9 +6,9 @@ using Test
         @test success(`docker --version`)
     end
 
-    @testset "Basic test" begin
+    @testset "with_container()" begin
         config = DockerConfig(;
-            image = "julia:buster",
+            image = "julia:latest",
             verbose = true,
         )
 
@@ -43,5 +43,9 @@ using Test
             wait(p)
             @test !success(p)
         end
+    end
+
+    @testset "Errors" begin
+        @test_throws ArgumentError Docker._generate_dockerfile(DockerConfig(; image = "foo", platform = :foo))
     end
 end

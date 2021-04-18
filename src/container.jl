@@ -51,13 +51,18 @@ function cleanup_container(container::DockerContainer)
 end
 
 function _generate_dockerfile(config::DockerConfig)
-    return """
-    FROM --platform=linux $(config.image)
-    RUN usermod -L root
-    RUN groupadd --system myuser
-    RUN useradd --create-home --shell /bin/bash --system --gid myuser myuser
-    USER myuser
-    """
+    if config.platform === :linux
+        return """
+        FROM --platform=linux $(config.image)
+        RUN usermod -L root
+        RUN groupadd --system myuser
+        RUN useradd --create-home --shell /bin/bash --system --gid myuser myuser
+        USER myuser
+        """
+    else
+        msg = "Invalid value for config.platform: $(config.platform)"
+        throw(ArgumentError(msg))
+    end
 end
 
 """
