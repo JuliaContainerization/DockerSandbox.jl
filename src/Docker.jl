@@ -1,7 +1,6 @@
 module Docker
 
 import Base: run, success
-import DocStringExtensions
 import Random
 
 export DockerConfig

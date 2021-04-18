@@ -77,32 +77,32 @@ function build_docker_image(config::DockerConfig)
             open("Dockerfile", "w") do io
                 println(io, strip(dockerfile))
             end
-            if config.stdout_docker_build === nothing
+            if config.docker_build_stdout === nothing
                 if config.verbose
-                    stdout_docker_build = Base.stdout
+                    docker_build_stdout = Base.stdout
                 else
-                    stdout_docker_build = Base.devnull
+                    docker_build_stdout = Base.devnull
                 end
             else
-                stdout_docker_build = config.stdout_docker_build
+                docker_build_stdout = config.docker_build_stdout
             end
-            if config.stderr_docker_build === nothing
+            if config.docker_build_stderr === nothing
                 if config.verbose
-                    stderr_docker_build = Base.stderr
+                    docker_build_stderr = Base.stderr
                 else
-                    stderr_docker_build = Base.devnull
+                    docker_build_stderr = Base.devnull
                 end
             else
-                stderr_docker_build = config.stderr_docker_build
+                docker_build_stderr = config.docker_build_stderr
             end
-            (stdout_docker_build isa IO) || throw(ArgumentError("stdout_docker_build must be an IO"))
-            (stderr_docker_build isa IO) || throw(ArgumentError("stderr_docker_build must be an IO"))
+            (docker_build_stdout isa IO) || throw(ArgumentError("docker_build_stdout must be an IO"))
+            (docker_build_stderr isa IO) || throw(ArgumentError("docker_build_stderr must be an IO"))
             run(
                 pipeline(
                     `docker build -t $(docker_image) .`;
                     stdin = Base.devnull,
-                    stdout = stdout_docker_build,
-                    stderr = stderr_docker_build,
+                    stdout = docker_build_stdout,
+                    stderr = docker_build_stderr,
                 )
             )
         end
