@@ -15,7 +15,7 @@ makedocs(;
     ),
     pages=[
         "Home"                => "index.md",
-        "Examples"            => "index.md",
+        "Examples"            => "examples.md",
         "Public API"          => "public.md",
         "Internals (Private)" => "internals.md",
     ],
