@@ -11,9 +11,10 @@ end
     with_container(f::Function, container::DockerContainer)
 """
 function with_container(f::Function, container::DockerContainer)
+    cleanup(container)
     try
         return f(container)
     finally
-        cleanup_container(container)
+        cleanup(container)
     end
 end

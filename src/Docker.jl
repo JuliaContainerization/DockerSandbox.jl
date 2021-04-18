@@ -11,6 +11,7 @@ export with_container
 include("types.jl")
 
 include("base.jl")
+include("cleanup.jl")
 include("container.jl")
 include("convenience.jl")
 
