@@ -6,17 +6,16 @@ $(DocStringExtensions.TYPEDFIELDS )
 """
 Base.@kwdef struct DockerConfig
     image::String
-    verbose::Bool                         = false
-    env::Dict{String, String}             = Dict{String, String}()
-    platform::Symbol                      = :linux
-    read_only_maps::Dict{String, String}  = Dict{String, String}()
-    read_write_maps::Dict{String, String} = Dict{String, String}()
-    stdin::IO                             = Base.devnull
-    stdout::IO                            = Base.stdout
-    stderr::IO                            = Base.stderr
-    stdin_docker_build::IO                = Base.devnull
-    stdout_docker_build::IO               = Base.stdout
-    stderr_docker_build::IO               = Base.stderr
+    verbose::Bool                           = false
+    env::Dict{String, String}               = Dict{String, String}()
+    platform::Symbol                        = :linux
+    read_only_maps::Dict{String, String}    = Dict{String, String}()
+    read_write_maps::Dict{String, String}   = Dict{String, String}()
+    stdin::IO                               = Base.devnull
+    stdout::IO                              = Base.stdout
+    stderr::IO                              = Base.stderr
+    stdout_docker_build::Union{IO, Nothing} = Base.stdout
+    stderr_docker_build::Union{IO, Nothing} = Base.stderr 
 end
 
 """
