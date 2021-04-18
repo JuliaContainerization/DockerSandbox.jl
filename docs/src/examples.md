@@ -13,7 +13,7 @@ config = DockerConfig(; image = "julia:latest");
 
 with_container() do container
     code = """
-    println("This was a success.")
+    println("Hello world!")
     """
     run(container, config, `julia -e $(code)`)
 end
