@@ -4,24 +4,28 @@ CurrentModule = Docker
 
 # Examples
 
+## Simple Example
+
 ```@example
 using Docker
 
-config = DockerConfig(; image = "julia:buster");
+config = DockerConfig(; image = "julia:latest");
 
 with_container() do container
     code = """
     println("This was a success.")
     """
     run(container, config, `julia -e $(code)`)
-end
+end;
 ```
+
+## Interactive Example
 
 ```julia
 julia> using Docker
 
 julia> config = DockerConfig(;
-           image = "julia:buster",
+           image = "julia:latest",
            Base.stdin,
            Base.stdout,
            Base.stderr,
