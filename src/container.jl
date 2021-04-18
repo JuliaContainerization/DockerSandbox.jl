@@ -77,12 +77,32 @@ function build_docker_image(config::DockerConfig)
             open("Dockerfile", "w") do io
                 println(io, strip(dockerfile))
             end
+            if config.stdout_docker_build === nothing
+                if config.verbose
+                    stdout_docker_build = Base.stdout
+                else
+                    stdout_docker_build = Base.devnull
+                end
+            else
+                stdout_docker_build = config.stdout_docker_build
+            end
+            if config.stderr_docker_build === nothing
+                if config.verbose
+                    stderr_docker_build = Base.stderr
+                else
+                    stderr_docker_build = Base.devnull
+                end
+            else
+                stderr_docker_build = config.stderr_docker_build
+            end
+            (stdout_docker_build isa IO) || throw(ArgumentError("stdout_docker_build must be an IO"))
+            (stderr_docker_build isa IO) || throw(ArgumentError("stderr_docker_build must be an IO"))
             run(
                 pipeline(
                     `docker build -t $(docker_image) .`;
                     stdin = Base.devnull,
-                    stdout = config.stdout_docker_build,
-                    stderr = config.stderr_docker_build,
+                    stdout = stdout_docker_build,
+                    stderr = stderr_docker_build,
                 )
             )
         end

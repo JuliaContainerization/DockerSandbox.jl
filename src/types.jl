@@ -14,8 +14,8 @@ Base.@kwdef struct DockerConfig
     stdin::IO                               = Base.devnull
     stdout::IO                              = Base.stdout
     stderr::IO                              = Base.stderr
-    stdout_docker_build::Union{IO, Nothing} = Base.stdout
-    stderr_docker_build::Union{IO, Nothing} = Base.stderr 
+    stdout_docker_build::Union{IO, Nothing} = nothing
+    stderr_docker_build::Union{IO, Nothing} = nothing
 end
 
 """

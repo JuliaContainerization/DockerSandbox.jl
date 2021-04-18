@@ -7,41 +7,48 @@ using Test
     end
 
     @testset "with_container()" begin
-        config = DockerConfig(;
-            image = "julia:latest",
-            verbose = true,
-        )
+        configs = [
+            DockerConfig(; image = "julia:latest", verbose = true),
+            DockerConfig(; image = "julia:latest", verbose = false),
+            DockerConfig(;
+                image = "julia:latest",
+                verbose = true,
+                stdout_docker_build = Base.devnull,
+                stderr_docker_build = Base.devnull,
+            ),
+        ]
+        for config in configs
+            with_container() do container
+                code = """
+                println("This was a success.")
+                """
+                @test success(container, config, `julia -e $(code)`)
+            end
 
-        with_container() do container
-            code = """
-            println("This was a success.")
-            """
-            @test success(container, config, `julia -e $(code)`)
-        end
+            with_container() do container
+                code = """
+                throw(ErrorException("This was a failure."))
+                """
+                @test !success(container, config, `julia -e $(code)`)
+            end
 
-        with_container() do container
-            code = """
-            throw(ErrorException("This was a failure."))
-            """
-            @test !success(container, config, `julia -e $(code)`)
-        end
+            with_container() do container
+                code = """
+                println("This was a success.")
+                """
+                p = run(container, config, `julia -e $(code)`; wait = false)
+                wait(p)
+                @test success(p)
+            end
 
-        with_container() do container
-            code = """
-            println("This was a success.")
-            """
-            p = run(container, config, `julia -e $(code)`; wait = false)
-            wait(p)
-            @test success(p)
-        end
-
-        with_container() do container
-            code = """
-            throw(ErrorException("This was a failure."))
-            """
-            p = run(container, config, `julia -e $(code)`; wait = false)
-            wait(p)
-            @test !success(p)
+            with_container() do container
+                code = """
+                throw(ErrorException("This was a failure."))
+                """
+                p = run(container, config, `julia -e $(code)`; wait = false)
+                wait(p)
+                @test !success(p)
+            end
         end
     end
 
