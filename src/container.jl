@@ -54,7 +54,7 @@ function _generate_dockerfile(config::DockerConfig)
     if config.platform === :linux
         return """
         FROM --platform=linux $(config.image)
-        RUN usermod -L root
+        RUN usermod --lock root
         RUN groupadd --system myuser
         RUN useradd --create-home --shell /bin/bash --system --gid myuser myuser
         USER myuser
@@ -120,10 +120,10 @@ function build_container_command(container::DockerContainer,
 
     container_cmd_string = String[
         "docker", "run",
-        "--rm=true",                              # automatically remove the container when it exits
-        "--interactive",                          # keep STDIN open even if not attached
         "--security-opt=no-new-privileges",       # disable container processes from gaining new privileges
+        "--interactive",                          # keep STDIN open even if not attached
         "--label", docker_image_label(container), # set metadata
+        "--rm=true",                              # automatically remove the container when it exits
     ]
 
     # If we're doing a fully-interactive session, tell it to allocate a psuedo-TTY
@@ -138,7 +138,7 @@ function build_container_command(container::DockerContainer,
     # Start in the right directory
     append!(container_cmd_string, ["--workdir=/home/myuser]"])
 
-    # Add in read-only mappings (skipping the rootfs)
+    # Add in read-only mappings
 #     for (dst, src) in config.read_only_maps
 #         if dst == "/"
 #             continue
@@ -151,7 +151,7 @@ function build_container_command(container::DockerContainer,
 #         append!(container_cmd_string, ["-v", "$(src):$(dst)"])
 #     end
 
-    # Apply environment mappings, first from `config`, next from `cmd`.
+    # Apply environment mappings from `config`
 #     for (k, v) in config.env
 #         append!(container_cmd_string, ["-e", "$(k)=$(v)"])
 #     end
