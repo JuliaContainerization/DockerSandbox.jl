@@ -7,7 +7,7 @@ for f in (:run, :success)
                     config::DockerConfig,
                     cmd::Cmd;
                     kwargs...)
-            container_cmd = build_container_command(
+            container_cmd = construct_container_command(
                 container,
                 config,
                 cmd,

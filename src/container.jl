@@ -111,9 +111,9 @@ function build_docker_image(config::DockerConfig)
 end
 
 """
-    build_container_command(container::DockerContainer, config::DockerConfig, cmd::Cmd)
+    construct_container_command(container::DockerContainer, config::DockerConfig, cmd::Cmd)
 """
-function build_container_command(container::DockerContainer,
+function construct_container_command(container::DockerContainer,
                                  config::DockerConfig,
                                  cmd::Cmd)
     build_docker_image(config)
