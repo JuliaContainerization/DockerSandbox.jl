@@ -136,7 +136,7 @@ function build_container_command(container::DockerContainer,
     is_interactive && push!(container_cmd_string, "-t")
 
     # Start in the right directory
-    append!(container_cmd_string, ["--workdir=/home/myuser]"])
+    append!(container_cmd_string, ["--workdir=/home/myuser"])
 
     # Add in read-only mappings
 #     for (dst, src) in config.read_only_maps
