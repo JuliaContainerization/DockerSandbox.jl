@@ -5,6 +5,8 @@ import DocStringExtensions
 import Random
 
 export DockerConfig
+export run
+export success
 export with_container
 
 include("types.jl")
