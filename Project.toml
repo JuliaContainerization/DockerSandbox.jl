@@ -4,6 +4,7 @@ authors = ["Keno Fischer", "Dilum Aluthge", "contributors"]
 version = "1.0.0-DEV"
 
 [deps]
+Example = "7876af07-990d-54b4-ab0e-23690620f79a"
 Random = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [compat]
