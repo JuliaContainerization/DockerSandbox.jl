@@ -1,28 +1,37 @@
 """
-$(DocStringExtensions.TYPEDEF)
+    DockerConfig(; kwargs...)
 
-## Fields:
-$(DocStringExtensions.TYPEDFIELDS )
+## Required Keyword Arguments:
+- `image::String`
+
+## Optional Keyword Arguments:
+- `verbose::Bool = false`
+- `env::Dict{String, String} = Dict{String, String}()`
+- `platform::Symbol = :linux`
+- `read_only_maps::Dict{String, String} = Dict{String, String}()`
+- `read_write_maps::Dict{String, String} = Dict{String, String}()`
+- `stdin::IO = Base.devnull`
+- `stdout::IO = Base.stdout`
+- `stderr::IO = Base.stderr`
+- `docker_build_stdout::Union{IO, Nothing} = nothing`
+- `docker_build_stderr::Union{IO, Nothing} = nothing`
 """
 Base.@kwdef struct DockerConfig
     image::String
-    verbose::Bool                           = false
-    env::Dict{String, String}               = Dict{String, String}()
-    platform::Symbol                        = :linux
-    read_only_maps::Dict{String, String}    = Dict{String, String}()
-    read_write_maps::Dict{String, String}   = Dict{String, String}()
-    stdin::IO                               = Base.devnull
-    stdout::IO                              = Base.stdout
-    stderr::IO                              = Base.stderr
-    stdout_docker_build::Union{IO, Nothing} = nothing
-    stderr_docker_build::Union{IO, Nothing} = nothing
+    verbose::Bool = false
+    env::Dict{String, String} = Dict{String, String}()
+    platform::Symbol = :linux
+    read_only_maps::Dict{String, String} = Dict{String, String}()
+    read_write_maps::Dict{String, String} = Dict{String, String}()
+    stdin::IO = Base.devnull
+    stdout::IO = Base.stdout
+    stderr::IO = Base.stderr
+    docker_build_stdout::Union{IO, Nothing} = nothing
+    docker_build_stderr::Union{IO, Nothing} = nothing
 end
 
 """
-$(DocStringExtensions.TYPEDEF)
-
-## Fields:
-$(DocStringExtensions.TYPEDFIELDS )
+    DockerContainer()
 """
 Base.@kwdef struct DockerContainer
     label::String = Random.randstring(10)
