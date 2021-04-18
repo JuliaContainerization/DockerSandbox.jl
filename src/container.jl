@@ -80,7 +80,7 @@ function build_docker_image(config::DockerConfig)
             run(
                 pipeline(
                     `docker build -t $(docker_image) .`;
-                    stdin = config.stdin_docker_build,
+                    stdin = Base.devnull,
                     stdout = config.stdout_docker_build,
                     stderr = config.stderr_docker_build,
                 )
