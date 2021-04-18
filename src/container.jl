@@ -135,16 +135,6 @@ function build_container_command(container::DockerContainer,
 #     for (k, v) in config.env
 #         append!(container_cmd_string, ["-e", "$(k)=$(v)"])
 #     end
-    # if cmd.env !== nothing
-    #     for pair in cmd.env
-    #         append!(container_cmd_string, ["-e", pair])
-    #     end
-    # end
-
-    # Add in entrypoint, if it is set
-    # if config.entrypoint !== nothing
-    #     append!(container_cmd_string, ["--entrypoint", config.entrypoint])
-    # end
 
     push!(container_cmd_string, docker_image_name(config.image))
     append!(container_cmd_string, cmd.exec)
