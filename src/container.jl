@@ -42,11 +42,22 @@ function docker_image_name(image::String)
 end
 
 """
-    cleanup(container::DockerContainer)
+    cleanup_container(container::DockerContainer)
 """
-function cleanup(container::DockerContainer)
+function cleanup_container(container::DockerContainer)
     label = docker_image_label(container)
-    return success(`docker system prune --force --filter=label=$(label)`)
+    success(`docker system prune --force --filter=label=$(label)`)
+    return nothing
+end
+
+function _generate_dockerfile(config::DockerConfig)
+    return """
+    FROM --platform=linux $(config.image)
+    RUN usermod -L root
+    RUN groupadd --system myuser
+    RUN useradd --create-home --shell /bin/bash --system --gid myuser myuser
+    USER myuser
+    """
 end
 
 """
@@ -57,12 +68,9 @@ function build_docker_image(config::DockerConfig)
     mktempdir() do tmp_dir
         cd(tmp_dir) do
             rm("Dockerfile"; force = true, recursive = true)
+            dockerfile = _generate_dockerfile(config)
             open("Dockerfile", "w") do io
-                println(io, "FROM --platform=linux/amd64 $(config.image)")
-                println(io, "RUN usermod -L root") # lock the `root` account to prevent logging in as root
-                println(io, "RUN groupadd --system myuser") # create the group for the non-root user
-                println(io, "RUN useradd --create-home --shell /bin/bash --system --gid myuser myuser") # create the non-root user
-                println(io, "USER myuser") # switch to the non-root user
+                println(io, strip(dockerfile))
             end
             run(
                 pipeline(
