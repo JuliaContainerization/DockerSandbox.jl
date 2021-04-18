@@ -16,7 +16,7 @@ with_container() do container
     println("This was a success.")
     """
     run(container, config, `julia -e $(code)`)
-end;
+end
 ```
 
 ## Interactive Example
