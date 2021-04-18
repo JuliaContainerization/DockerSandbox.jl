@@ -9,3 +9,8 @@ Modules = [Docker]
 Public = true
 Private = false
 ```
+
+```@docs
+run
+success
+```
