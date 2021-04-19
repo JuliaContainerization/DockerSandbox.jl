@@ -149,15 +149,16 @@ function construct_container_command(container::DockerContainer,
         end
     end
 
-    # if config.read_write_maps !== nothing
-    #     for (dst, src) in pairs(config.read_write_maps)
-    #         if dst == "/"
-    #             throw(ArgumentError("Cannot provide a mapping for /"))
-    #         else
-    #             append!(container_cmd_string, ["-v", "$(src):$(dst)"])
-    #         end
-    #     end
-    # end
+    # Add in read-write mappings
+    if config.read_write_maps !== nothing
+        for (dst, src) in pairs(config.read_write_maps)
+            if dst == "/"
+                throw(ArgumentError("Cannot provide a mapping for /"))
+            else
+                append!(container_cmd_string, ["-v", "$(src):$(dst)"])
+            end
+        end
+    end
 
     # Apply environment mappings from `config`
     if config.env !== nothing
