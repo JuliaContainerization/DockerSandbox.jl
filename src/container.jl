@@ -139,22 +139,30 @@ function construct_container_command(container::DockerContainer,
     append!(container_cmd_string, ["--workdir=/home/myuser"])
 
     # Add in read-only mappings
-#     for (dst, src) in config.read_only_maps
-#         if dst == "/"
-#             continue
-#         end
-#         append!(container_cmd_string, ["-v", "$(src):$(dst):ro"])
-#     end
+    if config.read_only_maps !== nothing
+        for (dst, src) in pairs(config.read_only_maps)
+            if dst == "/"
+                throw(ArgumentError("Cannot provide a mapping for /"))
+            else
+                append!(container_cmd_string, ["-v", "$(src):$(dst):ro"])
+            end
+        end
+    end
 
-    # Add in read-write mappings
-#     for (dst, src) in config.read_write_maps
-#         append!(container_cmd_string, ["-v", "$(src):$(dst)"])
-#     end
+    # if config.read_write_maps !== nothing
+    #     for (dst, src) in pairs(config.read_write_maps)
+    #         if dst == "/"
+    #             throw(ArgumentError("Cannot provide a mapping for /"))
+    #         else
+    #             append!(container_cmd_string, ["-v", "$(src):$(dst)"])
+    #         end
+    #     end
+    # end
 
     # Apply environment mappings from `config`
-#     for (k, v) in config.env
-#         append!(container_cmd_string, ["-e", "$(k)=$(v)"])
-#     end
+    # for (k, v) in config.env
+    #     append!(container_cmd_string, ["-e", "$(k)=$(v)"])
+    # end
 
     push!(container_cmd_string, docker_image_name(config.image))
     append!(container_cmd_string, cmd.exec)
