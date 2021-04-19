@@ -12,10 +12,10 @@
                 image = "julia:latest",
                 read_only_maps = Dict("/" => "/foo"),
             ),
-            # DockerConfig(;
-            #     image = "julia:latest",
-            #     read_write_maps = Dict("/" => "/foo"),
-            # ),
+            DockerConfig(;
+                image = "julia:latest",
+                read_write_maps = Dict("/" => "/foo"),
+            ),
         ]
         for config in configs
             with_container() do container

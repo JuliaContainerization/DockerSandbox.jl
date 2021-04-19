@@ -27,9 +27,9 @@ function make_world_readable_recursively(root_dir::String)
     return apply_chmod_recursively(root_dir; dir_mode=0o555, file_mode=0o444)
 end
 
-# """
-#     make_world_writeable_recursively(root_dir::String)
-# """
-# function make_world_writeable_recursively(root_dir::String)
-#     return apply_chmod_recursively(root_dir; dir_mode=0o666, file_mode=0o777)
-# end
+"""
+    make_world_writeable_recursively(root_dir::String)
+"""
+function make_world_writeable_recursively(root_dir::String)
+    return apply_chmod_recursively(root_dir; dir_mode=0o777, file_mode=0o666)
+end
