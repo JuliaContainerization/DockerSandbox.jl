@@ -1,6 +1,6 @@
 @testset "Errors" begin
     @testset begin
-        config = DockerConfig(; image = "foo", platform = :foo)
+        config = DockerConfig(; base_image = "foo", platform = :foo)
         mktempdir() do build_directory
             @test_throws ArgumentError Docker._generate_dockerfile(config)
         end
@@ -9,11 +9,11 @@
     @testset begin
         configs = [
             DockerConfig(;
-                image = "julia:latest",
+                base_image = "julia:latest",
                 read_only_maps = Dict("/" => "/foo"),
             ),
             DockerConfig(;
-                image = "julia:latest",
+                base_image = "julia:latest",
                 read_write_maps = Dict("/" => "/foo"),
             ),
         ]
