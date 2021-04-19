@@ -9,7 +9,7 @@ end
     DockerConfig(; kwargs...)
 
 ## Required Keyword Arguments:
-- ``
+- `base_image::String`
 
 ## Optional Keyword Arguments:
 - `verbose::Bool = false`
@@ -26,7 +26,10 @@ end
 - `add_capabilities::Union{Vector{String}, Nothing} = nothing`
 """
 Base.@kwdef struct DockerConfig
+    # Required
     base_image::String
+
+    # Optional
     verbose::Bool = false
     env::Union{Dict{String, String}, Nothing} = nothing
     platform::Symbol = :linux
