@@ -160,9 +160,11 @@ function construct_container_command(container::DockerContainer,
     # end
 
     # Apply environment mappings from `config`
-    # for (k, v) in config.env
-    #     append!(container_cmd_string, ["-e", "$(k)=$(v)"])
-    # end
+    if config.env !== nothing
+        for (k, v) in pairs(config.env)
+            append!(container_cmd_string, ["-e", "$(k)=$(v)"])
+        end
+    end
 
     push!(container_cmd_string, docker_image_name(config.image))
     append!(container_cmd_string, cmd.exec)
