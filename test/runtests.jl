@@ -4,6 +4,8 @@ using Test
 import Pkg
 import TOML
 
+include("utils.jl")
+
 include("no_nonstdlib_deps.jl")
 include("docker_is_installed.jl")
 include("environment_variables.jl")

@@ -1,3 +1,5 @@
+module Utils
+
 """
     apply_chmod_recursively(root_dir::String; dir_mode::Integer, file_mode::Integer)
 """
@@ -33,3 +35,6 @@ end
 function make_world_writeable_recursively(root_dir::String)
     return apply_chmod_recursively(root_dir; dir_mode=0o777, file_mode=0o666)
 end
+
+
+end # module

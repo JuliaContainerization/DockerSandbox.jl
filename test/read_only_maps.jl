@@ -13,10 +13,8 @@
             ),
         )
 
-        mkpath(joinpath(tmpdir_ro, "my_subdirectory", "my_subsubdirectory"))
-        touch(joinpath(tmpdir_ro, "my_subdirectory", "my_subsubdirectory", "my_other_file"))
 
-        Docker.make_world_readable_recursively(tmpdir_ro)
+        Utils.make_world_readable_recursively(tmpdir_ro)
 
         with_container() do container
             code = """

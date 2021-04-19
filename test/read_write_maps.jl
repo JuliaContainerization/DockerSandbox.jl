@@ -24,8 +24,8 @@
                 ),
             )
 
-            Docker.make_world_readable_recursively(tmpdir_ro)
-            Docker.make_world_writeable_recursively(tmpdir_rw)
+            Utils.make_world_readable_recursively(tmpdir_ro)
+            Utils.make_world_writeable_recursively(tmpdir_rw)
 
             with_container() do container
                 code = """
