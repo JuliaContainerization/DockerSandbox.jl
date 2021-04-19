@@ -14,6 +14,6 @@ function with_container(f::Function, container::DockerContainer)
     try
         return f(container)
     finally
-        cleanup_container(container)
+        cleanup(container)
     end
 end
