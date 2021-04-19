@@ -6,7 +6,7 @@
 
 ## Optional Keyword Arguments:
 - `verbose::Bool = false`
-- `env::Dict{String, String} = Dict{String, String}()`
+- `env::Union{Dict{String, String}, Nothing} = nothing`
 - `platform::Symbol = :linux`
 - `read_only_maps::Union{Dict{String, String}, Nothing} = nothing`
 - `read_write_maps::Union{Dict{String, String}, Nothing} = nothing`
@@ -16,11 +16,13 @@
 - `docker_build_stdout::Union{IO, Nothing} = nothing`
 - `docker_build_stderr::Union{IO, Nothing} = nothing`
 
+
+
 """
 Base.@kwdef struct DockerConfig
     image::String
     verbose::Bool = false
-    env::Dict{String, String} = Dict{String, String}()
+    env::Union{Dict{String, String}, Nothing} = nothing
     platform::Symbol = :linux
     read_only_maps::Union{Dict{String, String}, Nothing} = nothing
     read_write_maps::Union{Dict{String, String}, Nothing} = nothing
