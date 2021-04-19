@@ -119,8 +119,10 @@ function construct_container_command(container::DockerContainer,
     build_docker_image(config)
 
     container_cmd_string = String[
-        "docker", "run",
+        "docker",
+        "run",
         "--security-opt=no-new-privileges",       # disable container processes from gaining new privileges
+        "--cap-drop=all",                         # drop all capabilities
         "--interactive",                          # keep STDIN open even if not attached
         "--label", docker_image_label(container), # set metadata
         "--rm=true",                              # automatically remove the container when it exits

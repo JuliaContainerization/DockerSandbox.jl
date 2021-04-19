@@ -15,9 +15,6 @@
 - `stderr::IO = Base.stderr`
 - `docker_build_stdout::Union{IO, Nothing} = nothing`
 - `docker_build_stderr::Union{IO, Nothing} = nothing`
-
-
-
 """
 Base.@kwdef struct DockerConfig
     image::String
