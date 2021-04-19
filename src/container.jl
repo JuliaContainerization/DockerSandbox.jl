@@ -42,9 +42,9 @@ function docker_image_name(image::String)
 end
 
 """
-    cleanup_container(container::DockerContainer)
+    cleanup(container::DockerContainer)
 """
-function cleanup_container(container::DockerContainer)
+function cleanup(container::DockerContainer)
     label = docker_image_label(container)
     success(`docker system prune --force --filter=label=$(label)`)
     return nothing
