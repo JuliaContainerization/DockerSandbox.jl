@@ -1,8 +1,15 @@
 """
+    DockerContainer()
+"""
+Base.@kwdef struct DockerContainer
+    label::String = Random.randstring(10)
+end
+
+"""
     DockerConfig(; kwargs...)
 
 ## Required Keyword Arguments:
-- `base_image::String`
+- ``
 
 ## Optional Keyword Arguments:
 - `verbose::Bool = false`
@@ -15,6 +22,8 @@
 - `stderr::IO = Base.stderr`
 - `docker_build_stdout::Union{IO, Nothing} = nothing`
 - `docker_build_stderr::Union{IO, Nothing} = nothing`
+- `allow_advanced_features::Bool = false`
+- `add_capabilities::Union{Vector{String}, Nothing} = nothing`
 """
 Base.@kwdef struct DockerConfig
     base_image::String
@@ -28,11 +37,13 @@ Base.@kwdef struct DockerConfig
     stderr::IO = Base.stderr
     docker_build_stdout::Union{IO, Nothing} = nothing
     docker_build_stderr::Union{IO, Nothing} = nothing
+    allow_advanced_features::Bool = false
+    add_capabilities::Union{Vector{String}, Nothing} = nothing
 end
 
-"""
-    DockerContainer()
-"""
-Base.@kwdef struct DockerContainer
-    label::String = Random.randstring(10)
+function assert_config_consistency(config::DockerConfig)
+    if !config.allow_advanced_features
+        (config.add_capabilities === nothing) || throw(ArgumentError("`config.allow_advanced_features` must be true in order to use `config.add_capabilities`"))
+    end
+    return nothing
 end

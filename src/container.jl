@@ -114,19 +114,24 @@ end
     construct_container_command(container::DockerContainer, config::DockerConfig, cmd::Cmd)
 """
 function construct_container_command(container::DockerContainer,
-                                 config::DockerConfig,
-                                 cmd::Cmd)
+                                     config::DockerConfig,
+                                     cmd::Cmd)
+    assert_config_consistency(config::DockerConfig)
+
     build_docker_image(config)
 
-    container_cmd_string = String[
-        "docker",
-        "run",
-        "--security-opt=no-new-privileges",       # disable container processes from gaining new privileges
-        "--cap-drop=all",                         # drop all capabilities
-        "--interactive",                          # keep STDIN open even if not attached
-        "--label", docker_image_label(container), # set metadata
-        "--rm=true",                              # automatically remove the container when it exits
-    ]
+    container_cmd_string = String["docker", "run"]
+
+    append!(container_cmd_string, ["--security-opt=no-new-privileges"]) # disable container processes from gaining new privileges
+    append!(container_cmd_string, ["--cap-drop=all"]) # drop all capabilities
+    if config.add_capabilities !== nothing
+        for cap in config.add_capabilities
+            append!(container_cmd_string, ["--cap-add=$(cap)"])
+        end
+    end
+    append!(container_cmd_string, ["--interactive"]) # keep STDIN open even if not attached
+    append!(container_cmd_string, ["--label", docker_image_label(container)]) # set metadata
+    append!(container_cmd_string, ["--rm=true"]) # automatically remove the container when it exits
 
     # If we're doing a fully-interactive session, tell it to allocate a psuedo-TTY
     is_interactive = all(
@@ -135,7 +140,7 @@ function construct_container_command(container::DockerContainer,
             Base.TTY,
         )
     )
-    is_interactive && push!(container_cmd_string, "-t")
+    is_interactive && append!(container_cmd_string, ["-t"])
 
     # Start in the right directory
     append!(container_cmd_string, ["--workdir=/home/myuser"])
@@ -169,7 +174,7 @@ function construct_container_command(container::DockerContainer,
         end
     end
 
-    push!(container_cmd_string, docker_image_name(config.base_image))
+    append!(container_cmd_string, [docker_image_name(config.base_image)])
     append!(container_cmd_string, cmd.exec)
 
     container_cmd = Cmd(container_cmd_string)
