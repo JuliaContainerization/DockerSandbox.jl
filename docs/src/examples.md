@@ -9,7 +9,7 @@ CurrentModule = Docker
 ```@example
 using Docker
 
-config = DockerConfig(; image = "julia:latest");
+config = DockerConfig(; base_image = "julia:latest");
 
 with_container() do container
     code = """
@@ -25,7 +25,7 @@ end
 julia> using Docker
 
 julia> config = DockerConfig(;
-           image = "julia:latest",
+           base_image = "julia:latest",
            Base.stdin,
            Base.stdout,
            Base.stderr,

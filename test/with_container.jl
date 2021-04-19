@@ -1,9 +1,9 @@
 @testset "with_container()" begin
     configs = [
-        DockerConfig(; image = "julia:latest", verbose = true),
-        DockerConfig(; image = "julia:latest", verbose = false),
+        DockerConfig(; base_image = "julia:latest", verbose = true),
+        DockerConfig(; base_image = "julia:latest", verbose = false),
         DockerConfig(;
-            image = "julia:latest",
+            base_image = "julia:latest",
             verbose = true,
             docker_build_stdout = Base.devnull,
             docker_build_stderr = Base.devnull,

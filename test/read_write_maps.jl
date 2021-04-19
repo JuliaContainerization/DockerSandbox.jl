@@ -15,7 +15,7 @@
             @test !isfile(joinpath(tmpdir_rw, "myrwoutputfile"))
 
             config = DockerConfig(;
-                image = "julia:latest",
+                base_image = "julia:latest",
                 read_only_maps = Dict(
                     "/home/myuser/workdir_ro" => tmpdir_ro,
                 ),

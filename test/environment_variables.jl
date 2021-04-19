@@ -1,6 +1,6 @@
 @testset "environment variables" begin
     config = DockerConfig(;
-        image = "julia:latest",
+        base_image = "julia:latest",
         env = Dict{String, String}("MY_ENVIRONMENT_VARIABLE" => "hello_world")
     )
 

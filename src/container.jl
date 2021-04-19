@@ -53,7 +53,7 @@ end
 function _generate_dockerfile(config::DockerConfig)
     if config.platform === :linux
         return """
-        FROM --platform=linux $(config.image)
+        FROM --platform=linux $(config.base_image)
         RUN usermod --lock root
         RUN groupadd --system myuser
         RUN useradd --create-home --shell /bin/bash --system --gid myuser myuser
@@ -69,7 +69,7 @@ end
     build_docker_image(config::DockerConfig)
 """
 function build_docker_image(config::DockerConfig)
-    docker_image = docker_image_name(config.image)
+    docker_image = docker_image_name(config.base_image)
     mktempdir() do tmp_dir
         cd(tmp_dir) do
             rm("Dockerfile"; force = true, recursive = true)
@@ -169,7 +169,7 @@ function construct_container_command(container::DockerContainer,
         end
     end
 
-    push!(container_cmd_string, docker_image_name(config.image))
+    push!(container_cmd_string, docker_image_name(config.base_image))
     append!(container_cmd_string, cmd.exec)
 
     container_cmd = Cmd(container_cmd_string)
