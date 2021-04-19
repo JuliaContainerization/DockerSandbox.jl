@@ -13,6 +13,5 @@ include("types.jl")
 include("base.jl")
 include("container.jl")
 include("convenience.jl")
-include("utils.jl")
 
 end # module
