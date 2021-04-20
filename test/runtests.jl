@@ -11,9 +11,7 @@ include("docker_is_installed.jl")
 
 include("add_capabilities.jl")
 include("environment_variables.jl")
-# include("errors.jl")
+include("errors.jl")
 include("read_only_maps.jl")
 include("read_write_maps.jl")
 include("with_container.jl")
-
-include("errors.jl")
