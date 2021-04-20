@@ -1,16 +1,16 @@
-using Docker
+using DockerSandbox
 using Documenter
 
-DocMeta.setdocmeta!(Docker, :DocTestSetup, :(using Docker); recursive=true)
+DocMeta.setdocmeta!(DockerSandbox, :DocTestSetup, :(using DockerSandbox); recursive=true)
 
 makedocs(;
-    modules=[Docker],
+    modules=[DockerSandbox],
     authors="Keno Fischer, Dilum Aluthge, and contributors",
-    repo="https://github.com/JuliaContainerization/Docker.jl/blob/{commit}{path}#{line}",
-    sitename="Docker.jl",
+    repo="https://github.com/JuliaContainerization/DockerSandbox.jl/blob/{commit}{path}#{line}",
+    sitename="DockerSandbox.jl",
     format=Documenter.HTML(;
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://JuliaContainerization.github.io/Docker.jl",
+        canonical="https://JuliaContainerization.github.io/DockerSandbox.jl",
         assets=String[],
     ),
     pages=[
@@ -24,5 +24,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo="github.com/JuliaContainerization/Docker.jl",
+    repo="github.com/JuliaContainerization/DockerSandbox.jl",
 )

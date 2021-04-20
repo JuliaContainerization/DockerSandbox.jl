@@ -1,5 +1,5 @@
 ```@meta
-CurrentModule = Docker
+CurrentModule = DockerSandbox
 ```
 
 # Prerequisites

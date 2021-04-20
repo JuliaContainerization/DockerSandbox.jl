@@ -1,4 +1,4 @@
-module Docker
+module DockerSandbox
 
 import Base: run, success
 import Random

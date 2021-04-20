@@ -1,5 +1,5 @@
 ```@meta
-CurrentModule = Docker
+CurrentModule = DockerSandbox
 ```
 
 # Examples
@@ -7,7 +7,7 @@ CurrentModule = Docker
 ## Simple Example
 
 ```@example
-using Docker
+using DockerSandbox
 
 config = DockerConfig(; base_image = "julia:latest");
 
@@ -22,7 +22,7 @@ end
 ## Interactive Example
 
 ```julia
-julia> using Docker
+julia> using DockerSandbox
 
 julia> config = DockerConfig(;
            base_image = "julia:latest",
