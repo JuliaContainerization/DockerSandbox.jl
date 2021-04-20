@@ -116,8 +116,6 @@ end
 function construct_container_command(container::DockerContainer,
                                      config::DockerConfig,
                                      cmd::Cmd)
-    assert_config_consistency(config::DockerConfig)
-
     build_docker_image(config)
 
     container_cmd_string = String["docker", "run"]

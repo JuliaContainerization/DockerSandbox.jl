@@ -1,7 +1,6 @@
 @testset "add capabilities" begin
     config = DockerConfig(;
         base_image = "julia:latest",
-        allow_advanced_features = true,
         add_capabilities = ["CAP_CHOWN"],
     )
     with_container() do container

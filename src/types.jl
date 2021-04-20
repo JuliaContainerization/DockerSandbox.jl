@@ -22,7 +22,6 @@ end
 - `stderr::IO = Base.stderr`
 - `docker_build_stdout::Union{IO, Nothing} = nothing`
 - `docker_build_stderr::Union{IO, Nothing} = nothing`
-- `allow_advanced_features::Bool = false`
 - `add_capabilities::Union{Vector{String}, Nothing} = nothing`
 """
 Base.@kwdef struct DockerConfig
@@ -40,13 +39,5 @@ Base.@kwdef struct DockerConfig
     stderr::IO = Base.stderr
     docker_build_stdout::Union{IO, Nothing} = nothing
     docker_build_stderr::Union{IO, Nothing} = nothing
-    allow_advanced_features::Bool = false
     add_capabilities::Union{Vector{String}, Nothing} = nothing
-end
-
-function assert_config_consistency(config::DockerConfig)
-    if !config.allow_advanced_features
-        (config.add_capabilities === nothing) || throw(ArgumentError("`config.allow_advanced_features` must be true in order to use `config.add_capabilities`"))
-    end
-    return nothing
 end
