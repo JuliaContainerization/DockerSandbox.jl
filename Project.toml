@@ -1,4 +1,4 @@
-name = "Docker"
+name = "DockerSandbox"
 uuid = "15bad361-1dfa-5a14-8210-7c6791966b1c"
 authors = ["Keno Fischer", "Dilum Aluthge", "contributors"]
 version = "1.0.0"

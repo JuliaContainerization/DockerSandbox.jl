@@ -2,7 +2,7 @@
     @testset begin
         config = DockerConfig(; base_image = "foo", platform = :foo)
         mktempdir() do build_directory
-            @test_throws ArgumentError Docker._generate_dockerfile(config)
+            @test_throws ArgumentError DockerSandbox._generate_dockerfile(config)
         end
     end
 

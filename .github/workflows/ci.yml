@@ -60,9 +60,9 @@ jobs:
       - run: |
           julia --project=docs -e '
             using Documenter: DocMeta, doctest
-            using Docker
-            DocMeta.setdocmeta!(Docker, :DocTestSetup, :(using Docker); recursive=true)
-            doctest(Docker)'
+            using DockerSandbox
+            DocMeta.setdocmeta!(DockerSandbox, :DocTestSetup, :(using DockerSandbox); recursive=true)
+            doctest(DockerSandbox)'
       - run: julia --project=docs docs/make.jl
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

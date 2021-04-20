@@ -1,11 +1,11 @@
 ```@meta
-CurrentModule = Docker
+CurrentModule = DockerSandbox
 ```
 
 # Internals (Private)
 
 ```@autodocs
-Modules = [Docker]
+Modules = [DockerSandbox]
 Public = false
 Private = true
 ```

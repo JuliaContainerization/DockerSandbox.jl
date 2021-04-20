@@ -1,6 +1,6 @@
 @testset "Ensure that there are no non-stdlib dependencies" begin
     package_directories = String[
-        dirname(dirname(pathof(Docker))),
+        dirname(dirname(pathof(DockerSandbox))),
         dirname(@__DIR__),
         dirname(dirname(@__FILE__)),
     ]
